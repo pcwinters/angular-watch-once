@@ -1,36 +1,14 @@
-describe 'ngWatchOnce', ->
-
-	describe 'ngWatchOnceConfig', ->
-
-		it 'should default to decorating the $rootScope', ->
-			module 'ngWatchOnce'
-			inject (@ngWatchOnceConfig)->
-			expect(@ngWatchOnceConfig.decorator).toBeTruthy()
-
+describe 'ngWatchOnce.decorator', ->
 	describe '$rootScope decorator', ->
 		beforeEach ->
-			angular.module('test.ngWatchOnce.decorator.true', []).config (ngWatchOnceConfig)->
-				ngWatchOnceConfig.decorator = true
-			angular.module('test.ngWatchOnce.decorator.false', []).config (ngWatchOnceConfig)->
-				ngWatchOnceConfig.decorator = false
-				
-		it 'should not decorate the $rootScope when configured', ->
-			module 'ngWatchOnce'
-			module 'test.ngWatchOnce.decorator.false'
-			inject (@$rootScope)->
-			expect(@$rootScope.$watchOnce).not.toBeDefined()
-			expect(@$rootScope.$watchCollectionOnce).not.toBeDefined()
+			module 'ngWatchOnce.decorator'
 
 		it 'should decorate the $rootScope when configured', ->
-			module 'ngWatchOnce'
-			module 'test.ngWatchOnce.decorator.true'
 			inject (@$rootScope)->
 			expect(@$rootScope.$watchOnce).toBeDefined()
 			expect(@$rootScope.$watchCollectionOnce).toBeDefined()
 
 		it 'should inherit $watchOnce through child scopes', ()->
-			module 'ngWatchOnce'
-			module 'test.ngWatchOnce.decorator.true'
 			inject (@$rootScope)->
 			scope = @$rootScope.$new()
 			expect(scope.$watchOnce).toBeDefined()
@@ -38,27 +16,25 @@ describe 'ngWatchOnce', ->
 
 		it 'should invoke $watchOnce', ->
 			$watchOnce = jasmine.createSpy('$watchOnce')
-			module 'ngWatchOnce'
-			module 'test.ngWatchOnce.decorator.true'
 			module {
 				'$watchOnce': $watchOnce
 			}
 			inject (@$rootScope)->
 			scope = @$rootScope.$new()
-			scope.$watchOnce('expression', 'toDo', 'deepWatch', 'defer')
-			expect($watchOnce).toHaveBeenCalledWith(scope, 'expression', 'toDo', 'deepWatch', 'defer')
+			scope.$watchOnce('expression', 'toDo', 'deepWatch', 'always')
+			expect($watchOnce).toHaveBeenCalledWith(scope, 'expression', 'toDo', 'deepWatch', 'always')
 
 		it 'should invoke $watchCollectionOnce', ->
 			$watchCollectionOnce = jasmine.createSpy('$watchCollectionOnce')
-			module 'ngWatchOnce'
-			module 'test.ngWatchOnce.decorator.true'
 			module {
 				'$watchCollectionOnce': $watchCollectionOnce
 			}
 			inject (@$rootScope)->
 			scope = @$rootScope.$new()
-			scope.$watchCollectionOnce('expression', 'toDo', 'deepWatch', 'defer')
-			expect($watchCollectionOnce).toHaveBeenCalledWith(scope, 'expression', 'toDo', 'deepWatch', 'defer')
+			scope.$watchCollectionOnce('expression', 'toDo', 'deepWatch', 'always')
+			expect($watchCollectionOnce).toHaveBeenCalledWith(scope, 'expression', 'toDo', 'deepWatch', 'always')
+
+describe 'ngWatchOnce', ->
 
 	describe '$watchCollectionOnce', ->
 
@@ -68,9 +44,9 @@ describe 'ngWatchOnce', ->
 			@callback = jasmine.createSpy('change callback')
 
 		it 'should defer invoking the callback if specified', ->
-			defer = true
+			always = false
 			@$scope.property = null
-			@$watchCollectionOnce @$scope, 'property', @callback, false, defer
+			@$watchCollectionOnce @$scope, 'property', @callback, false, always
 			@$scope.$digest()
 			expect(@callback).not.toHaveBeenCalled()
 			@$scope.property = ['foo']
@@ -78,10 +54,10 @@ describe 'ngWatchOnce', ->
 			expect(@callback).toHaveBeenCalledWith(['foo'], undefined, @$scope)
 
 		it 'should defer invoking the callback if specified and the collection is not allowed to be empty', ->
-			defer = true
+			always = false
 			allowEmpty = false
 			@$scope.property = []
-			@$watchCollectionOnce @$scope, 'property', @callback, false, defer, allowEmpty
+			@$watchCollectionOnce @$scope, 'property', @callback, false, always, allowEmpty
 			@$scope.$digest()
 			expect(@callback).not.toHaveBeenCalled()
 			@$scope.property = ['foo']
@@ -89,17 +65,17 @@ describe 'ngWatchOnce', ->
 			expect(@callback).toHaveBeenCalledWith(['foo'], undefined, @$scope)
 
 		it 'should invoke the callback on property changes', ->
-			defer = false
+			always = true
 			@$scope.property = ['foo']
-			@$watchCollectionOnce @$scope, 'property', @callback, false, defer
+			@$watchCollectionOnce @$scope, 'property', @callback, false, always
 			@$scope.$digest()
 			expect(@callback).toHaveBeenCalledWith(['foo'], ['foo'], @$scope)
 
 		it 'should invoke the callback if the collection is allowed to be empty', ->
-			defer = false
+			always = true
 			allowEmpty = true
 			@$scope.property = []
-			@$watchCollectionOnce @$scope, 'property', @callback, false, defer, allowEmpty
+			@$watchCollectionOnce @$scope, 'property', @callback, false, always, allowEmpty
 			@$scope.$digest()
 			expect(@callback).toHaveBeenCalledWith([], [], @$scope)
 
@@ -149,9 +125,9 @@ describe 'ngWatchOnce', ->
 			@callback = jasmine.createSpy('change callback')
 
 		it 'should defer invoking the callback if specified', ->
-			defer = true
+			always = false
 			@$scope.property = null
-			@$watchOnce @$scope, 'property', @callback, false, defer
+			@$watchOnce @$scope, 'property', @callback, false, always
 			@$scope.$digest()
 			expect(@callback).not.toHaveBeenCalled()
 			@$scope.property = 'foo'
@@ -159,9 +135,9 @@ describe 'ngWatchOnce', ->
 			expect(@callback).toHaveBeenCalledWith('foo', null, @$scope)
 
 		it 'should invoke the callback on property changes', ->
-			defer = false
+			always = true
 			@$scope.property = 'foo'
-			@$watchOnce @$scope, 'property', @callback, false, defer
+			@$watchOnce @$scope, 'property', @callback, false, always
 			@$scope.$digest()
 			expect(@callback).toHaveBeenCalledWith('foo', 'foo', @$scope)
 
