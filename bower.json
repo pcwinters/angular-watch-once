@@ -1,0 +1,29 @@
+{
+  "name": "ng-watch-once",
+  "version": "0.0.1",
+  "main": "dist/watchOnce.js",
+  "ignore": [
+    "src",
+    "test",
+    "**/.*",
+    "bower_components",
+    "node_modules"
+  ],
+  "dependencies": {
+    "lodash": "~2",
+    "angular": "~1.2",
+    "angular-mocks": "~1.2"
+  },
+  "license": "MIT",
+  "keywords": [
+    "angular",
+    "watch",
+    "performance"
+  ],
+  "authors": [
+    "Patrick Winters <pwinters@rallydev.com>"
+  ],
+  "homepage": "https://github.com/pcw216/ng-watch-once",
+  "repository": "git@github.com:pcw216/ng-watch-once.git",
+  "description": "scope.$watch until defined"
+}
